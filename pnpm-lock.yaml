@@ -14,6 +14,9 @@ dependencies:
   '@codemirror/lang-javascript':
     specifier: ^6.1.9
     version: 6.1.9
+  '@codemirror/lang-sass':
+    specifier: ^6.0.2
+    version: 6.0.2(@codemirror/view@6.14.0)
   '@codemirror/language':
     specifier: ^6.8.0
     version: 6.8.0
@@ -32,12 +35,18 @@ dependencies:
   '@tailwindcss/typography':
     specifier: ^0.5.9
     version: 0.5.9(tailwindcss@3.3.2)
+  classnames:
+    specifier: ^2.3.2
+    version: 2.3.2
   codemirror:
     specifier: ^6.0.1
     version: 6.0.1(@lezer/common@1.0.3)
   daisyui:
     specifier: ^3.1.9
     version: 3.1.9(postcss@8.4.24)
+  sass.js:
+    specifier: ^0.11.1
+    version: 0.11.1
   solid-js:
     specifier: ^1.7.6
     version: 1.7.6
@@ -1392,6 +1401,10 @@ packages:
       fsevents: 2.3.2
     dev: false
 
+  /classnames@2.3.2:
+    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
+    dev: false
+
   /codemirror@6.0.1(@lezer/common@1.0.3):
     resolution: {integrity: sha512-J8j+nZ+CdWmIeFIGXEFbFPtpiYacFMDR8GlHK3IyHQJMCaVRfGx9NT+Hxivv1ckLWPvNdZqndbr/7lVhrf/Svg==}
     dependencies:
@@ -1943,6 +1956,10 @@ packages:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
     dependencies:
       queue-microtask: 1.2.3
+    dev: false
+
+  /sass.js@0.11.1:
+    resolution: {integrity: sha512-X9AtzYFr/HZ+pDIxX6xN74w/H9JjnDHqZcsYY8mr/SpCyhDVN1pJ3G0Q9rb+z3pZ7obZdYuTYMbKl1ALuhbZDw==}
     dev: false
 
   /semver@6.3.0:
