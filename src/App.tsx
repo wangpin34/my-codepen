@@ -1,6 +1,5 @@
 import type { Component } from 'solid-js'
 import { createSignal } from 'solid-js'
-import styles from './App.module.css'
 import Codeblock from './components/codeblock'
 
 const App: Component = () => {
@@ -8,14 +7,28 @@ const App: Component = () => {
   const [css, setCSS] = createSignal('')
   const [js, setJS] = createSignal('')
   const result = () =>
-    `<html><head><style>${css()}</style></head><body>${html()}<body><script type="javascript">${js()}</script><html>`
+    `<html>
+    <head>
+    <style>
+    ${css()}
+    </style>
+    </head>
+    <body>
+    ${html()}
+    <body>
+    <script type="javascript">
+    ${js()}
+    </script>
+    <html>`
   const blob = () => new Blob([result()], { type: 'text/html' })
   return (
-    <div class={styles.App}>
-      <Codeblock value={html()} onChange={setHtml} language='html' />
-      <Codeblock value={css()} onChange={setCSS} language='css' />
-      <Codeblock value={js()} onChange={setJS} language='js' />
-      <iframe src={URL.createObjectURL(blob())} />
+    <div class='h-screen flex flex-col'>
+      <div class='h-3/6 grid grid-cols-3 gap-x-2'>
+        <Codeblock initialValue={''} onChange={setHtml} language='html' />
+        <Codeblock initialValue={''} onChange={setCSS} language='css' />
+        <Codeblock initialValue={''} onChange={setJS} language='javascript' />
+      </div>
+      <iframe src={URL.createObjectURL(blob())} class='w-full h-3/6' />
     </div>
   )
 }
