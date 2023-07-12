@@ -16,11 +16,10 @@ const App: Component = () => {
     <body>
     ${html()}
     <body>
-    <script type="javascript">
+    <script type="text/javascript">
     ${js()}
     </script>
     <html>`
-  const blob = () => new Blob([result()], { type: 'text/html' })
   return (
     <div class='h-screen flex flex-col'>
       <div class='h-3/6 grid grid-cols-3 gap-x-2'>
@@ -28,7 +27,7 @@ const App: Component = () => {
         <Codeblock initialValue={''} onChange={setCSS} language='css' />
         <Codeblock initialValue={''} onChange={setJS} language='javascript' />
       </div>
-      <iframe src={URL.createObjectURL(blob())} class='w-full h-3/6' />
+      <iframe srcdoc={result()} class='w-full h-3/6' />
     </div>
   )
 }
