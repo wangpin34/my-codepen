@@ -2,7 +2,7 @@ import { css } from '@codemirror/lang-css'
 import { html } from '@codemirror/lang-html'
 import { javascript } from '@codemirror/lang-javascript'
 import { sass } from '@codemirror/lang-sass'
-import { EditorState } from '@codemirror/state'
+import { EditorState, StateEffect } from '@codemirror/state'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
@@ -25,63 +25,62 @@ interface Props {
   language: Language
 }
 
-function useCodemirror({
-  node,
-  initialDoc,
-  language,
-  onChange,
-}: {
+function useCodemirror(props: {
   node: Element | DocumentFragment
   initialDoc?: string
   language: Language
   onChange: (state: EditorState) => void
 }) {
   const [editorView, setEditorView] = createSignal<EditorView>()
-  const lgPkg = () => languages[language]
-  const state = () =>
+  const lgPkg = () => languages[props.language]
+  const [state] = createSignal(
     EditorState.create({
-      doc: initialDoc || '',
+      doc: props.initialDoc || '',
       extensions: [
         basicSetup,
         lgPkg(),
         oneDark,
         EditorView.updateListener.of((update: any) => {
           if (update.changes) {
-            onChange && onChange(update.state)
+            props.onChange && props.onChange(update.state)
           }
         }),
       ],
     })
+  )
 
   createEffect(() => {
-    if (!editorView()) return
-    console.log('update state', state())
+    console.log(`update state`, props.language)
+    state().update({
+      effects: [StateEffect.reconfigure.of(lgPkg())],
+    })
+    console.log(props.language, state())
     editorView()?.setState(state())
   })
 
   createEffect(() => {
-    if (!node) return
+    if (!props.node) return
     if (editorView()) return
     const view = new EditorView({
       state: state(),
-      parent: node,
+      parent: props.node,
     })
-
     setEditorView(view)
   })
 
   return [editorView()]
 }
 
-export default function Codeblock({ language, initialValue, onChange }: Props) {
+export default function Codeblock(props: Props) {
   let node = <div class={`codeeditor h-full box`}></div>
-  const handleChange = (state: EditorState) => onChange(state.doc.toString())
+  const handleChange = (state: EditorState) =>
+    props.onChange(state.doc.toString())
   //@ts-ignore
   const [editView] = useCodemirror({
     //@ts-ignore
     node,
-    initialDoc: initialValue,
-    language,
+    initialDoc: props.initialValue,
+    language: props.language,
     onChange: handleChange,
   })
   return <>{node}</>

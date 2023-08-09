@@ -98,7 +98,7 @@ function SettingsModal(props: SettingsProps) {
               }))
             }
           >
-            <option disabled selected value={CSS_Preprocessors.Plain}>
+            <option selected value={CSS_Preprocessors.Plain}>
               No preprocessor
             </option>
             <option value={CSS_Preprocessors.Sass}>SASS</option>
@@ -167,7 +167,10 @@ export default function CSSCodeblock(props: Props) {
   return (
     <div class='flex flex-col'>
       <div class='flex flex-row items-center'>
-        <span>CSS</span>
+        <span>
+          CSS[{cssLanguages[settings().preprocessor ?? CSS_Preprocessors.Plain]}
+          ]
+        </span>
         <SettingsModal settings={settings()} onSubmit={setSettings} />
       </div>
       <Codeblock
