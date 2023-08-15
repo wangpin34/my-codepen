@@ -16,15 +16,10 @@ sass.options(
   }
 )
 
-var scss = '$someVar: 123px; .some-selector { width: $someVar; }'
-sass.compile(scss, function (result: any) {
-  console.log(result)
-})
-
 enum CSS_Preprocessors {
-  Plain,
-  Sass,
-  Scss,
+  Plain = 'plain',
+  Sass = 'sass',
+  Scss = 'scss',
 }
 
 const cssLanguages: Record<CSS_Preprocessors, 'css' | 'sass' | 'scss'> = {
@@ -62,13 +57,12 @@ function SettingsModal(props: SettingsProps) {
     <>
       <Button
         onClick={() => setShow((pre) => !pre)}
-        size='xs'
         colorSchema='ghost'
       >
-        <Settings size={16} color='#cccccc' />
+        <Settings size={20} color='#3a4a5a' />
       </Button>
       <Modal
-        title='HTML settings'
+        title='CSS settings'
         show={show()}
         onClose={handleCancel}
         actionButtons={
@@ -85,24 +79,25 @@ function SettingsModal(props: SettingsProps) {
         <div class='form-control w-full max-w-xs'>
           <label class='label'>
             <span class='label-text'>
-              Pick the preprocessor - {values().preprocessor}
+              Pick the preprocessor
             </span>
           </label>
           <select
-            class='select select-bordered'
-            value={values().preprocessor}
+            class='select select-bordered w-full max-w-xs'
+            data-css-preprocessor={values().preprocessor}
             onChange={(e) =>
               setValues((pre) => ({
                 ...pre,
-                preprocessor: parseInt(e.target.value),
+                preprocessor: e.target.value as CSS_Preprocessors,
               }))
             }
           >
-            <option selected value={CSS_Preprocessors.Plain}>
-              No preprocessor
+            {/* <option disabled selected>Pick the preprocessor you want</option> */}
+            <option value={CSS_Preprocessors.Plain} selected={values().preprocessor === CSS_Preprocessors.Plain}>
+              None (use plain CSS)
             </option>
-            <option value={CSS_Preprocessors.Sass}>SASS</option>
-            <option value={CSS_Preprocessors.Scss}>SCSS</option>
+            <option value={CSS_Preprocessors.Sass} selected={values().preprocessor === CSS_Preprocessors.Sass}>SASS</option>
+            <option value={CSS_Preprocessors.Scss} selected={values().preprocessor === CSS_Preprocessors.Scss}>SCSS</option>
           </select>
         </div>
       </Modal>
@@ -143,20 +138,35 @@ export default function CSSCodeblock(props: Props) {
     }
   })
 
+
+  interface CompilerError {
+    column: number
+    line: number
+    file: string
+    formatted: string
+    message: string
+    status: 1 // 1 for err, 0 for ok
+  }
+
+  interface CompilerResult {
+    status: 0 // 1 for err, 0 for ok
+    text: string
+  }
+
   const transformPreprocessor = (
     source: string,
     onSuccess: (result: string) => void,
-    onError?: (error: string) => void
+    onError?: (err: CompilerError) => void
   ) => {
     if (
       settings().preprocessor === CSS_Preprocessors.Sass ||
       settings().preprocessor === CSS_Preprocessors.Scss
     ) {
-      sass.compile(source, function (result: { status: 0 | 1; text: string }) {
+      sass.compile(source, function (result: CompilerResult | CompilerError) {
         if (result.status === 0) {
           onSuccess(result.text)
         } else {
-          onError && onError(result.text)
+          onError && onError(result)
         }
       })
     } else {
@@ -167,16 +177,15 @@ export default function CSSCodeblock(props: Props) {
   return (
     <div class='flex flex-col'>
       <div class='flex flex-row items-center'>
-        <span>
-          CSS[{cssLanguages[settings().preprocessor ?? CSS_Preprocessors.Plain]}
-          ]
+        <span class="uppercase">
+          {cssLanguages[settings().preprocessor ?? CSS_Preprocessors.Plain]}
         </span>
         <SettingsModal settings={settings()} onSubmit={setSettings} />
       </div>
       <Codeblock
         initialValue={''}
         onChange={(value: string) =>
-          transformPreprocessor(value, props.onChange)
+          transformPreprocessor(value, props.onChange, (errMsg) => console.error(errMsg))
         }
         language={
           cssLanguages[settings().preprocessor ?? CSS_Preprocessors.Plain]

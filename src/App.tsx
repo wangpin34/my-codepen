@@ -25,14 +25,14 @@ const App: Component = () => {
     <div class='h-screen flex flex-col'>
       <div class='h-3/6 grid grid-cols-3 gap-x-2'>
         <div class='flex flex-col'>
-          <div class='flex flex-row items-center'>
+          <div class='flex flex-row items-center min-h-[48px]'>
             <span>HTML</span>
           </div>
           <Codeblock initialValue={''} onChange={setHtml} language='html' />
         </div>
         <CSSCodeblock onChange={(css) => setCSS(css)} />
         <div class='flex flex-col'>
-          <div class='flex flex-row items-center'>
+          <div class='flex flex-row items-center min-h-[48px]'>
             <span>JavaScript</span>
           </div>
           <Codeblock initialValue={''} onChange={setJS} language='javascript' />
