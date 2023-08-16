@@ -1,6 +1,6 @@
-import devtools from 'solid-devtools/vite'
 import { defineConfig } from 'vite'
 import solid from 'vite-plugin-solid'
+import viteTsconfigPaths from "vite-tsconfig-paths"
 
 export default defineConfig({
   plugins: [
@@ -13,6 +13,7 @@ export default defineConfig({
     //   autoname: true, // e.g. enable autoname
     // }),
     solid(),
+    viteTsconfigPaths(),
   ],
   server: {
     port: 3000,
