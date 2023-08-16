@@ -1,5 +1,5 @@
 import type { Component } from 'solid-js'
-import { createSignal } from 'solid-js'
+import { createEffect, createSignal } from 'solid-js'
 import Codeblock from './components/codeblock'
 import CSSCodeblock from './components/css-codeblock'
 
@@ -7,7 +7,7 @@ const App: Component = () => {
   const [html, setHtml] = createSignal('')
   const [css, setCSS] = createSignal('')
   const [js, setJS] = createSignal('')
-  const result = () =>
+  const inframeSrcDoc = () =>
     `<html>
     <head>
     <style>
@@ -21,6 +21,28 @@ const App: Component = () => {
     ${js()}
     </script>
     <html>`
+  const shadowHTML = () => `
+    <style>
+    ${css()}
+    </style>
+    <script type="text/javascript">
+    ${js()}
+    </script>
+    ${html()}
+  `
+  createEffect(() => {
+    console.log(shadowHTML())
+    const shadowHost = document.getElementById('shadowHost')
+    if (shadowHost) {
+      let shadowRoot = shadowHost.shadowRoot
+      if (!shadowRoot) {
+        shadowRoot = shadowHost.attachShadow({ mode: "open" })
+      }
+      
+      shadowRoot.innerHTML = shadowHTML()
+    }
+  })
+
   return (
     <div class='h-screen flex flex-col'>
       <div class='h-3/6 grid grid-cols-3 gap-x-2'>
@@ -38,7 +60,8 @@ const App: Component = () => {
           <Codeblock initialValue={''} onChange={setJS} language='javascript' />
         </div>
       </div>
-      <iframe srcdoc={result()} class='w-full h-3/6' />
+      <iframe srcdoc={inframeSrcDoc()} class='w-full h-1.5/6' />
+      <div id="shadowHost" class='w-full h-1.5/6'></div>
     </div>
   )
 }
