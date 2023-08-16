@@ -61,7 +61,12 @@ const App: Component = () => {
         </div>
       </div>
       <iframe srcdoc={inframeSrcDoc()} class='w-full h-1.5/6' />
-      <div id="shadowHost" class='w-full h-1.5/6'></div>
+      <div id="shadowHost" class='w-full h-1.5/6'>
+        {/* Declarative Shadow DOM https://developer.chrome.com/articles/declarative-shadow-dom/ , shadow dom for SSR */}
+        <template shadowrootmode="open">
+          {shadowHTML()}
+        </template>
+      </div>
     </div>
   )
 }
