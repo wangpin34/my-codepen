@@ -1,5 +1,6 @@
 import Codeblock from 'components/codeblock';
 import CSSCodeblock from 'components/css-codeblock';
+import { CSS_Preprocessors } from 'contexts/settings-context';
 import useSettings from 'hooks/useSettings';
 import useSource from 'hooks/useSource';
 import { createEffect } from 'solid-js';
@@ -14,6 +15,7 @@ interface ContentProps {
 }
 
 function IframeContentRenderer({source}: ContentProps) {
+ const [settings] = useSettings()
  const iframeSrcDoc = () =>
     `<html>
     <head>
@@ -27,9 +29,10 @@ function IframeContentRenderer({source}: ContentProps) {
     <script type="text/javascript">
     ${source.js}
     </script>
-    <html>`
+    </html>
+    `
 
-    return  <iframe title="srcdoc" id="srcdoc" name="srcdoc" srcdoc={iframeSrcDoc()} class='w-full h-1.5/6' />
+    return  <iframe title="srcdoc" id="srcdoc" name="srcdoc" srcdoc={iframeSrcDoc()} class='w-full h-3/6' />
 }
 
 
@@ -54,7 +57,7 @@ function ShadowDOMContentRenderer({source}: ContentProps) {
       shadowRoot.innerHTML = shadowHTML()
     }
   })
-  return <div id="shadowHost" class='w-full h-1.5/6'>
+  return <div id="shadowHost" class='w-full h-3/6'>
         {/* Declarative Shadow DOM https://developer.chrome.com/articles/declarative-shadow-dom/ , shadow dom for SSR */}
         <template shadowrootmode="open">
           {shadowHTML()}
@@ -63,12 +66,18 @@ function ShadowDOMContentRenderer({source}: ContentProps) {
 }
 
 
+const cssLanguages: Record<CSS_Preprocessors, 'css' | 'sass' | 'scss'> = {
+  [CSS_Preprocessors.Plain]: 'css',
+  [CSS_Preprocessors.Sass]: 'sass',
+  [CSS_Preprocessors.Scss]: 'scss',
+}
+
 
 function CodePen() {
   const [source, setter] = useSource()
   const [settings] = useSettings()
   return (
-    <div class='h-screen flex flex-col'>
+    <div class='h-full w-full flex flex-col'>
       <div class='h-3/6 grid grid-cols-3 gap-x-2'>
         <div class='flex flex-col'>
           <div class='flex flex-row items-center min-h-[48px]'>
@@ -76,7 +85,15 @@ function CodePen() {
           </div>
           <Codeblock initialValue={source.html} onChange={setter.setHTML} language='html' />
         </div>
-        <CSSCodeblock onChange={setter.setCSS} initialValue={source.css}/>
+        <div class='flex flex-col'>
+          <div class='flex flex-row items-center min-h-[48px]'>
+            <span class="uppercase">
+              {cssLanguages[settings.cssPreprocessor ?? CSS_Preprocessors.Plain]}
+            </span>
+          </div>
+           <CSSCodeblock onChange={setter.setCSS} initialValue={source.css}/>
+        </div>
+       
         <div class='flex flex-col'>
           <div class='flex flex-row items-center min-h-[48px]'>
             <span>JavaScript</span>

@@ -15,9 +15,6 @@ export default defineConfig({
     solid(),
     viteTsconfigPaths(),
   ],
-  server: {
-    port: 3000,
-  },
   build: {
     target: 'esnext',
   },
