@@ -1,45 +1,49 @@
-import Codeblock from 'components/codeblock'
-import CSSCodeblock from 'components/css-codeblock'
-import { createEffect } from 'solid-js'
+import Codeblock from 'components/codeblock';
+import CSSCodeblock from 'components/css-codeblock';
+import useSettings from 'hooks/useSettings';
+import useSource from 'hooks/useSource';
+import { createEffect } from 'solid-js';
 
-interface Props {
-  html?: string
-  css?: string
-  js?: string
-  setHTML: (html: string) => void
-  setCSS: (css: string) => void
-  setJS: (js: string) => void
+interface ContentProps {
+  source: {
+    html: string
+  css: string
+  js: string
+  }
+  
 }
 
-function CodePen(props: Props) {
-  const html = () => props.html
-  const css = () => props.css
-  const js = () => props.js
-  const {setHTML, setCSS, setJS} = props
-  const inframeSrcDoc = () =>
+function IframeContentRenderer({source}: ContentProps) {
+ const iframeSrcDoc = () =>
     `<html>
     <head>
     <style>
-    ${css()}
+    ${source.css}
     </style>
     </head>
     <body>
-    ${html()}
+    ${source.html}
     <body>
     <script type="text/javascript">
-    ${js()}
+    ${source.js}
     </script>
     <html>`
-  const shadowHTML = () => `
+
+    return  <iframe title="srcdoc" id="srcdoc" name="srcdoc" srcdoc={iframeSrcDoc()} class='w-full h-1.5/6' />
+}
+
+
+function ShadowDOMContentRenderer({source}: ContentProps) {
+ const shadowHTML = () => `
     <style>
-    ${css()}
+    ${source.css}
     </style>
     <script type="text/javascript">
-    ${js()}
+    ${source.js}
     </script>
-    ${html()}
+    ${source.html}
   `
-  createEffect(() => {
+    createEffect(() => {
     const shadowHost = document.getElementById('shadowHost')
     if (shadowHost) {
       let shadowRoot = shadowHost.shadowRoot
@@ -50,7 +54,19 @@ function CodePen(props: Props) {
       shadowRoot.innerHTML = shadowHTML()
     }
   })
+  return <div id="shadowHost" class='w-full h-1.5/6'>
+        {/* Declarative Shadow DOM https://developer.chrome.com/articles/declarative-shadow-dom/ , shadow dom for SSR */}
+        <template shadowrootmode="open">
+          {shadowHTML()}
+        </template>
+      </div>
+}
 
+
+
+function CodePen() {
+  const [source, setter] = useSource()
+  const [settings] = useSettings()
   return (
     <div class='h-screen flex flex-col'>
       <div class='h-3/6 grid grid-cols-3 gap-x-2'>
@@ -58,23 +74,18 @@ function CodePen(props: Props) {
           <div class='flex flex-row items-center min-h-[48px]'>
             <span>HTML</span>
           </div>
-          <Codeblock initialValue={''} onChange={setHTML} language='html' />
+          <Codeblock initialValue={source.html} onChange={setter.setHTML} language='html' />
         </div>
-        <CSSCodeblock onChange={setCSS} />
+        <CSSCodeblock onChange={setter.setCSS} initialValue={source.css}/>
         <div class='flex flex-col'>
           <div class='flex flex-row items-center min-h-[48px]'>
             <span>JavaScript</span>
           </div>
-          <Codeblock initialValue={''} onChange={setJS} language='javascript' />
+          <Codeblock initialValue={source.js} onChange={setter.setJS} language='javascript' />
         </div>
       </div>
-      <iframe srcdoc={inframeSrcDoc()} class='w-full h-1.5/6' />
-      <div id="shadowHost" class='w-full h-1.5/6'>
-        {/* Declarative Shadow DOM https://developer.chrome.com/articles/declarative-shadow-dom/ , shadow dom for SSR */}
-        <template shadowrootmode="open">
-          {shadowHTML()}
-        </template>
-      </div>
+      
+      {settings.contentAs === 'shadow-dom' ? <ShadowDOMContentRenderer source={source} /> : <IframeContentRenderer source={source} />}
     </div>
   )
 }

@@ -28,9 +28,7 @@ const cssLanguages: Record<CSS_Preprocessors, 'css' | 'sass' | 'scss'> = {
   [CSS_Preprocessors.Scss]: 'scss',
 }
 
-interface Props {
-  onChange: (v: string) => void
-}
+
 
 interface SettingsProps {
   settings: {
@@ -103,6 +101,11 @@ function SettingsModal(props: SettingsProps) {
       </Modal>
     </>
   )
+}
+
+interface Props {
+  initialValue?: string
+  onChange: (v: string) => void
 }
 
 export default function CSSCodeblock(props: Props) {
@@ -183,7 +186,7 @@ export default function CSSCodeblock(props: Props) {
         <SettingsModal settings={settings()} onSubmit={setSettings} />
       </div>
       <Codeblock
-        initialValue={''}
+        initialValue={props.initialValue}
         onChange={(value: string) =>
           transformPreprocessor(value, props.onChange, (errMsg) => console.error(errMsg))
         }
